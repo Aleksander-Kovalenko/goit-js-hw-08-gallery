@@ -45,7 +45,6 @@ function getLinkImg(e) {
 function onCloseImgModal() {
   ref.lightbox.classList.remove('is-open');
   window.removeEventListener('keydown', onPressKey);
-
   ref.imgForModal.src = '';
   ref.imgForModal.alt = '';
 }
