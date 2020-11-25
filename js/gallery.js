@@ -27,9 +27,9 @@ function createImgCard(images) {
 }
 // Модальное окно
 function onOpenImgModal(e) {
+  if (e.target.nodeName !== 'IMG') return;
   window.addEventListener('keydown', onPressKey);
   e.preventDefault();
-  if (e.target.nodeName !== 'IMG') return;
   ref.lightbox.classList.add('is-open');
   getLinkImg(e);
 }
@@ -43,8 +43,8 @@ function getLinkImg(e) {
 }
 // Методы закрытия модалки
 function onCloseImgModal() {
-  window.removeEventListener('keydown', onPressKey);
   ref.lightbox.classList.remove('is-open');
+  window.removeEventListener('keydown', onPressKey);
 
   ref.imgForModal.src = '';
   ref.imgForModal.alt = '';
