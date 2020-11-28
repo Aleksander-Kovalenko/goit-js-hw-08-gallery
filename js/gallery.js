@@ -1,56 +1,69 @@
-import images from './data.js';
+import images from "./data.js";
 
 const ref = {
-  galleryContainer: document.querySelector('.js-gallery'),
-  lightbox: document.querySelector('.js-lightbox'),
-  imgForModal: document.querySelector('.lightbox__image'),
-  btnCloseModal: document.querySelector('button[data-action="close-lightbox"]'),
-  overlayRef: document.querySelector('.lightbox__overlay'),
+  galleryContainer: document.querySelector(".js-gallery"),
+  modalImg: document.querySelector(".lightbox__image"),
+  btnClose: document.querySelector(".lightbox__button"),
+  modal: document.querySelector(".lightbox__overlay"),
+  backDrop: document.querySelector(".lightbox"),
 };
-const imgCard = createImgCard(images);
 
-ref.galleryContainer.insertAdjacentHTML('beforeend', imgCard.join(''));
-ref.galleryContainer.addEventListener('click', onOpenImgModal);
-ref.overlayRef.addEventListener('click', onPressOverlay);
-ref.btnCloseModal.addEventListener('click', onCloseImgModal);
-
-// Разметка элемента галереи
-function createImgCard(images) {
-  return images.map(({ preview, original, description }) => {
-    return `<li class="gallery__item">
-  <a class="gallery__link" href="${original}">
-    <img class="gallery__image" src="${preview}"
-      data-source="${original}" alt="${description}"/>
+images.map((item, index) => {
+  ref.galleryContainer.innerHTML += `<li class="gallery__item">
+  <a class="gallery__link" href="${item.original}">
+    <img class="gallery__image" src="${item.preview}"
+      data-source="${item.original}" alt="${item.description}" data-index = "${index}"/>
         </a>
           </li>`;
-  });
-}
-// Модальное окно
-function onOpenImgModal(e) {
-  if (e.target.nodeName !== 'IMG') return;
-  window.addEventListener('keydown', onPressKey);
-  e.preventDefault();
-  ref.lightbox.classList.add('is-open');
-  getLinkImg(e);
-}
-// Поулчения адресса изображения
-function getLinkImg(e) {
-  const srcImg = e.target.dataset.source;
-  const altImg = e.target.dataset.alt;
+});
 
-  ref.imgForModal.src = srcImg;
-  ref.imgForModal.alt = altImg;
+ref.galleryContainer.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (!e.code === "IMG") return;
+
+  ref.backDrop.classList.add("is-open");
+
+  const modalLink = e.target.dataset.source;
+  const modalIndex = e.target.dataset.index;
+
+  ref.modalImg.setAttribute("src", modalLink);
+  ref.modalImg.setAttribute("data-index", modalIndex);
+});
+ref.btnClose.addEventListener("click", () => {
+  ref.backDrop.classList.remove("is-open");
+});
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeOverlay();
+  if (e.key === "ArrowRight") pressRight();
+  if (e.key === "ArrowLeft") pressLeft();
+});
+
+function closeOverlay() {
+  ref.backDrop.classList.remove("is-open");
+  ref.modalImg.src = "";
+  ref.modalImg.alt = "";
 }
-// Методы закрытия модалки
-function onCloseImgModal() {
-  ref.lightbox.classList.remove('is-open');
-  window.removeEventListener('keydown', onPressKey);
-  ref.imgForModal.src = '';
-  ref.imgForModal.alt = '';
+
+function setNewSrc(step, index) {
+  ref.modalImg.dataset.index = `${index + step}`;
+  ref.modalImg.setAttribute("src", images[index + step].original);
 }
-function onPressKey(e) {
-  if (e.code === 'Escape') onCloseImgModal();
+
+function pressRight() {
+  let index = +ref.modalImg.dataset.index;
+  if (index === images.length - 1) {
+    setNewSrc(0, 0);
+    return;
+  }
+  setNewSrc(1, index);
 }
-function onPressOverlay(e) {
-  if (e.target === ref.overlayRef) onCloseImgModal();
+
+function pressLeft() {
+  let index = +ref.modalImg.dataset.index;
+  if (index === 0) {
+    setNewSrc(0, images.length - 1);
+    return;
+  }
+  setNewSrc(-1, index);
 }
