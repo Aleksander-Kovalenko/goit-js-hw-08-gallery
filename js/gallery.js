@@ -1,69 +1,65 @@
 import images from "./data.js";
 
 const ref = {
-  galleryContainer: document.querySelector(".js-gallery"),
-  modalImg: document.querySelector(".lightbox__image"),
+  container: document.querySelector(".js-gallery"),
+  backDrop: document.querySelector(".js-lightbox"),
+  modalCard: document.querySelector(".lightbox__image"),
   btnClose: document.querySelector(".lightbox__button"),
-  modal: document.querySelector(".lightbox__overlay"),
-  backDrop: document.querySelector(".lightbox"),
 };
 
 images.map((item, index) => {
-  ref.galleryContainer.innerHTML += `<li class="gallery__item">
+  ref.container.innerHTML += `<li class="gallery__item">
   <a class="gallery__link" href="${item.original}">
-    <img class="gallery__image" src="${item.preview}"
-      data-source="${item.original}" alt="${item.description}" data-index = "${index}"/>
+    <img class="gallery__image"
+    src="${item.preview}"
+      data-source="${item.original}"
+      alt="${item.description}" 
+      data-index = "${index}"/>
         </a>
           </li>`;
 });
 
-ref.galleryContainer.addEventListener("click", (e) => {
+ref.container.addEventListener("click", (e) => {
+  if (!e.nodeName === "IMG") return;
   e.preventDefault();
-  if (!e.code === "IMG") return;
-
   ref.backDrop.classList.add("is-open");
-
-  const modalLink = e.target.dataset.source;
-  const modalIndex = e.target.dataset.index;
-
-  ref.modalImg.setAttribute("src", modalLink);
-  ref.modalImg.setAttribute("data-index", modalIndex);
+  ref.modalCard.setAttribute("src", e.target.dataset.source);
+  ref.modalCard.setAttribute("data-index", e.target.dataset.index);
+  ref.modalCard.setAttribute("alt", e.target.alt);
 });
-ref.btnClose.addEventListener("click", () => {
-  ref.backDrop.classList.remove("is-open");
-});
+ref.btnClose.addEventListener("click", onClickClose);
 
 window.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeOverlay();
-  if (e.key === "ArrowRight") pressRight();
-  if (e.key === "ArrowLeft") pressLeft();
+  if (e.key === "Escape") onClickClose();
+  if (e.key === "ArrowLeft") onPressLeft();
+  if (e.key === "ArrowRight") onPressRight();
 });
 
-function closeOverlay() {
+function setAttributeImg(step, index) {
+  ref.modalCard.dataset.index = `${step + index}`;
+  ref.modalCard.setAttribute("src", images[step + index].original);
+}
+
+function onClickClose() {
   ref.backDrop.classList.remove("is-open");
-  ref.modalImg.src = "";
-  ref.modalImg.alt = "";
+  ref.modalCard.src = "";
+  ref.modalCard.alt = "";
 }
 
-function setNewSrc(step, index) {
-  ref.modalImg.dataset.index = `${index + step}`;
-  ref.modalImg.setAttribute("src", images[index + step].original);
-}
-
-function pressRight() {
-  let index = +ref.modalImg.dataset.index;
-  if (index === images.length - 1) {
-    setNewSrc(0, 0);
-    return;
-  }
-  setNewSrc(1, index);
-}
-
-function pressLeft() {
-  let index = +ref.modalImg.dataset.index;
+function onPressLeft() {
+  const index = +ref.modalCard.dataset.index;
   if (index === 0) {
-    setNewSrc(0, images.length - 1);
+    setAttributeImg(0, images.length - 1);
     return;
   }
-  setNewSrc(-1, index);
+  setAttributeImg(-1, index);
+}
+
+function onPressRight() {
+  const index = +ref.modalCard.dataset.index;
+  if (index === images.length - 1) {
+    setAttributeImg(0, 0);
+    return;
+  }
+  setAttributeImg(1, index);
 }
