@@ -58,37 +58,50 @@ document.body.addEventListener("keydown", onKeydown);
 function onKeydown(e) {
   if (e.code === "Escape") {
     refs.overlay.classList.remove("is-open");
+    refs.gallery.removeAttribute("keypress", key);
     setAttributeOnImage();
   }
 }
 
-function setAttributeOnImage(src = "", alt = "", id = 0) {
-  // refs.image.dataset.id = id;
+function setAttributeOnImage(src = "", alt = "", id = "") {
+  // position = refs.image.dataset.id;
+
+  refs.image.dataset.id = id;
   refs.image.src = src;
   refs.image.alt = alt;
+
   // refs.overlay.classList.toggle("is-open");
 }
 
-// refs.gallery.addEventListener("keydown", key);
+refs.gallery.addEventListener("keydown", key);
 
-// function key(e) {
-//   if (e.key === "ArrowLeft") {
-//     console.log(refs.image.dataset.id);
-//     setAttributeOnImage(
-// galleryItems[refs.image.dataset.id].original,
-//       galleryItems[position].description
-//     );
-//     position -= 1;
-//   }
+function key(e) {
+  if (e.key === "ArrowLeft") {
+    // position = position - 1;
+    // console.log("id", refs.image.dataset.id);
+    // console.log("position", position);
+    // setAttributeOnImage(
+    //   galleryItems[position].original,
+    //   galleryItems[position].description
+    // );
+  }
 
-//   if (e.key === "ArrowRight") {
-//     console.log(position);
-//     setAttributeOnImage(
-//       galleryItems[position].original,
-//       galleryItems[position].description
-//     );
-//     position += 1;
-//   }
-// }
+  if (e.key === "ArrowRight") {
+    ArrowRight();
+    //   position += 1;
+    //   setAttributeOnImage(
+    //     galleryItems[position].original,
+    //     galleryItems[position].description
+    //   );
+  }
+}
 
 renderItemOfGallery();
+
+function ArrowRight() {
+  position = Number(refs.image.dataset.id) + 1;
+  const org = galleryItems[position].original;
+  const des = galleryItems[position].description;
+
+  setAttributeOnImage(org, des, position);
+}
